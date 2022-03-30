@@ -1,5 +1,6 @@
 package edu.iis.mto.time;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -22,12 +23,12 @@ class OrderTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        lenient().when(clock.getZone()).thenReturn(ZoneId.systemDefault());
         order = new Order(clock);
     }
 
     @Test
-    public void orderConfirmationAfterOrderExpireThrowsOrderExpiredException()
+    void orderConfirmationAfterOrderExpireThrowsOrderExpiredException()
     {
         Instant orderSubmissionTime = Instant.now();
         Instant orderConformationTime = orderSubmissionTime.plus(27,ChronoUnit.HOURS);
@@ -40,7 +41,7 @@ class OrderTest {
     }
 
     @Test
-    public void orderConfirmationWithinAcceptedTimeChangeOrderState()
+    void orderConfirmationWithinAcceptedTimeChangeOrderState()
     {
         Instant orderSubmissionTime = Instant.now();
         Instant orderConformationTime = orderSubmissionTime.plus(4,ChronoUnit.HOURS);
@@ -52,4 +53,10 @@ class OrderTest {
         assertEquals(Order.State.CONFIRMED, order.getOrderState());
 
     }
+    @Test
+    void orderConfirmationWithoutSubmitThrowsOrderStateException()
+    {
+        assertThrows(OrderStateException.class,()->order.confirm());
+    }
+
 }
