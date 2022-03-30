@@ -35,7 +35,21 @@ class OrderTest {
         when(clock.instant()).thenReturn(orderSubmissionTime).thenReturn(orderConformationTime);
         order.submit();
         assertThrows(OrderExpiredException.class,()->order.confirm());
-        assertEquals(order.getOrderState(), Order.State.CANCELLED);
+        assertEquals(Order.State.CANCELLED, order.getOrderState());
+
+    }
+
+    @Test
+    public void orderConfirmationWithinAcceptedTimeChangeOrderState()
+    {
+        Instant orderSubmissionTime = Instant.now();
+        Instant orderConformationTime = orderSubmissionTime.plus(4,ChronoUnit.HOURS);
+
+        when(clock.instant()).thenReturn(orderSubmissionTime).thenReturn(orderConformationTime);
+        order.submit();
+        assertEquals(Order.State.SUBMITTED,order.getOrderState());
+        order.confirm();
+        assertEquals(Order.State.CONFIRMED, order.getOrderState());
 
     }
 }
