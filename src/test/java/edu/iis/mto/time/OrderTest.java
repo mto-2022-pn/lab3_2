@@ -48,6 +48,39 @@ class OrderTest {
         assertThrows(OrderExpiredException.class, () -> order.confirm());
     }
 
-    
+    @Test
+    public void methodTryingToConfirmNotSubmittedOrderShouldThrowException()
+    {
+        assertThrows(OrderStateException.class,()->order.confirm());
+    }
+
+    @Test
+    public void methodTryingToRealizeNotSubmittedOrderShouldThrowException()
+    {
+        assertThrows(OrderStateException.class,()->order.realize());
+    }
+
+    @Test
+    public void addingItemToConfirmedOrderShouldThrowException(){
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime time = LocalDateTime.now();
+        when(clock.instant()).thenReturn(time.atZone(zoneId).toInstant());
+        order.submit();
+        order.confirm();
+
+        assertThrows(OrderStateException.class,()->order.addItem(new OrderItem()));
+    }
+
+    @Test
+    public void allStepsShouldEndWithSuccesWhenCalledInOrderAndWithCorrectTime(){
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime time = LocalDateTime.now();
+        when(clock.instant()).thenReturn(time.atZone(zoneId).toInstant());
+        order.submit();
+        order.confirm();
+
+
+        assertDoesNotThrow(() -> order.realize());
+    }
 
 }
