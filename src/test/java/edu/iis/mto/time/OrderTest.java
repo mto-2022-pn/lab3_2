@@ -76,10 +76,10 @@ class OrderTest {
         ZoneId zoneId = ZoneId.systemDefault();
         LocalDateTime time = LocalDateTime.now();
         when(clock.instant()).thenReturn(time.atZone(zoneId).toInstant());
-        order.submit();
-        order.confirm();
 
-
+        
+        assertDoesNotThrow(() -> order.submit());
+        assertDoesNotThrow(() -> order.confirm());
         assertDoesNotThrow(() -> order.realize());
     }
 
