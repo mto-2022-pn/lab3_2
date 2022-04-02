@@ -12,8 +12,15 @@ class OrderTest {
     void setUp() throws Exception {}
 
     @Test
-    void test() {
-        fail("Not yet implemented");
+    void orderShouldBeInRealizedState() {
+        Order order=new Order();
+        OrderItem orderItem=new OrderItem();
+        order.addItem(orderItem);
+        order.submit();
+        order.confirm();
+        order.realize();
+        assertEquals(Order.State.REALIZED,order.getOrderState());
     }
+
 
 }

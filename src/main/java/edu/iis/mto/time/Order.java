@@ -5,14 +5,21 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class Order {
 
     private static final long VALID_PERIOD_HOURS = 24;
     private State orderState;
     private List<OrderItem> items = new ArrayList<>();
     private LocalDateTime subbmitionDate;
+    private LocalDateTime orderDate;
 
     public Order() {
+        orderDate =LocalDateTime.now();
+        orderState = State.CREATED;
+    }
+    public Order(LocalDateTime localDateTime) {
+        orderDate =localDateTime;
         orderState = State.CREATED;
     }
 
@@ -28,8 +35,7 @@ public class Order {
         requireState(State.CREATED);
 
         orderState = State.SUBMITTED;
-        subbmitionDate = LocalDateTime.now();
-
+        subbmitionDate = orderDate;
     }
 
     public void confirm() {
