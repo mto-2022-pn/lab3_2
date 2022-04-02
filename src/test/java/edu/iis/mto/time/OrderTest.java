@@ -62,6 +62,15 @@ class OrderTest {
         }catch(OrderStateException ignored){
         }
     }
+    @Test
+    void orderShouldBeInConfirmedState(){
+        Order order=new Order();
+        OrderItem orderItem=new OrderItem();
+        order.addItem(orderItem);
+        order.submit();
+        order.confirm();
+        assertEquals(Order.State.CONFIRMED,order.getOrderState());
+    }
 
 
 }
