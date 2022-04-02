@@ -36,6 +36,32 @@ class OrderTest {
         }
         assertEquals(Order.State.CANCELLED,order.getOrderState());
     }
+    @Test
+    void orderShouldbeInCreatedState(){
+        Order order=new Order();
+        OrderItem orderItem=new OrderItem();
+        order.addItem(orderItem);
+        assertEquals(Order.State.CREATED,order.getOrderState());
+    }
+    @Test
+    void orderShouldbeInSubmittedState(){
+        Order order=new Order();
+        OrderItem orderItem=new OrderItem();
+        order.addItem(orderItem);
+        order.submit();
+        assertEquals(Order.State.SUBMITTED,order.getOrderState());
+    }
+    @Test
+    void orderIsInWrongState(){
+        Order order=new Order();
+        OrderItem orderItem=new OrderItem();
+        order.addItem(orderItem);
+        try {
+            order.confirm();
+            fail("expected OrderStateException");
+        }catch(OrderStateException ignored){
+        }
+    }
 
 
 }
