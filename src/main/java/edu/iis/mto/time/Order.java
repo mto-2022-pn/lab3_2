@@ -3,13 +3,14 @@ package edu.iis.mto.time;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Order {
 
     private static final long VALID_PERIOD_HOURS = 24;
     private State orderState;
-    private List<OrderItem> items = new ArrayList<>();
+    private final List<OrderItem> items = new ArrayList<>();
     private LocalDateTime subbmitionDate;
     private CurrentTimeGetter currentTimeGetter = new DefaultCurrentTimeGetter();
 
@@ -20,6 +21,10 @@ public class Order {
     public Order(CurrentTimeGetter timeGetter) {
         orderState = State.CREATED;
         this.currentTimeGetter = timeGetter;
+    }
+
+    public static long getValidPeriodHours() {
+        return VALID_PERIOD_HOURS;
     }
 
     public void addItem(OrderItem item) {
@@ -65,9 +70,9 @@ public class Order {
         }
 
         throw new OrderStateException("order should be in state "
-                                      + allowedStates
-                                      + " to perform required  operation, but is in "
-                                      + orderState);
+                + Arrays.toString(allowedStates)
+                + " to perform required  operation, but is in "
+                + orderState);
 
     }
 
