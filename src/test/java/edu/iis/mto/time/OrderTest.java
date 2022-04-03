@@ -7,13 +7,24 @@ import org.junit.jupiter.api.Test;
 
 
 class OrderTest {
-
-    @BeforeEach
-    void setUp() throws Exception {}
-
+    private static final long VALID_PERIOD_HOURS = 24;
     @Test
-    void test() {
-        fail("Not yet implemented");
+    void testOrderRealizedInValidHours() {
+        Order order = new Order(new DefaultFakeClock());
+        order.addItem(new OrderItem());
+        order.submit();
+        order.confirm();
+        order.getFakeClock().plusHours(5);
+        order.realize();
+        assertEquals(Order.State.REALIZED, order.getOrderState());
+    }
+    @Test
+    void testOrderRealizedInInvalidHours() {
+        Order order = new Order(new DefaultFakeClock());
+        order.addItem(new OrderItem());
+        order.submit();
+        order.getFakeClock().plusHours(VALID_PERIOD_HOURS + 1);
+        assertThrows(OrderExpiredException.class, order::confirm);
     }
 
 }

@@ -13,9 +13,7 @@ public class DefaultFakeClock implements FakeClock {
     }
 
     @Override
-    public void changeHours(int hours) {
-        if (hours > 0)
-            currentTime = currentTime.plusHours(hours);
-        currentTime = currentTime.minusHours(-hours);
+    public void plusHours(long hours) {
+        currentTime = currentTime.plusHours(hours);
     }
 }
