@@ -8,23 +8,32 @@ import org.junit.jupiter.api.Test;
 
 class OrderTest {
     private static final long VALID_PERIOD_HOURS = 24;
+    private Order order;
+    @BeforeEach
+    void setUp() {
+        order = new Order(new DefaultFakeClock());
+        order.addItem(new OrderItem());
+    }
     @Test
     void testOrderRealizedInValidHours() {
-        Order order = new Order(new DefaultFakeClock());
-        order.addItem(new OrderItem());
         order.submit();
+        assertEquals(Order.State.SUBMITTED, order.getOrderState());
         order.confirm();
+        assertEquals(Order.State.CONFIRMED, order.getOrderState());
         order.getFakeClock().plusHours(5);
         order.realize();
         assertEquals(Order.State.REALIZED, order.getOrderState());
     }
+
     @Test
-    void testOrderRealizedInInvalidHours() {
-        Order order = new Order(new DefaultFakeClock());
-        order.addItem(new OrderItem());
+    void testOrderRealizedInInvalidHoursShouldThrowOrderExpiredException() {
         order.submit();
         order.getFakeClock().plusHours(VALID_PERIOD_HOURS + 1);
         assertThrows(OrderExpiredException.class, order::confirm);
     }
 
+    @Test
+    void testOrderConfirmationWithoutSubmitShouldThrowOrderStateException() {
+        assertThrows(OrderStateException.class, order::confirm);
+    }
 }
