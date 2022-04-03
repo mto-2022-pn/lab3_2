@@ -11,9 +11,15 @@ public class Order {
     private State orderState;
     private List<OrderItem> items = new ArrayList<>();
     private LocalDateTime subbmitionDate;
+    private CurrentTimeGetter currentTimeGetter = new DefaultCurrentTimeGetter();
 
     public Order() {
         orderState = State.CREATED;
+    }
+
+    public Order(CurrentTimeGetter timeGetter) {
+        orderState = State.CREATED;
+        this.currentTimeGetter = timeGetter;
     }
 
     public void addItem(OrderItem item) {
@@ -28,13 +34,13 @@ public class Order {
         requireState(State.CREATED);
 
         orderState = State.SUBMITTED;
-        subbmitionDate = LocalDateTime.now();
+        subbmitionDate = currentTimeGetter.now();
 
     }
 
     public void confirm() {
         requireState(State.SUBMITTED);
-        long hoursElapsedAfterSubmittion = subbmitionDate.until(LocalDateTime.now(), ChronoUnit.HOURS);
+        long hoursElapsedAfterSubmittion = subbmitionDate.until(currentTimeGetter.now(), ChronoUnit.HOURS);
         if (hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
             throw new OrderExpiredException();
