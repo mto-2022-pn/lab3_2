@@ -25,6 +25,20 @@ class OrderTest {
     }
 
     @Test
+    void elapsedTimeIsNegative_shouldChangeOrderStateToConfirmed() {
+        Instant submissionDate = Instant.now();
+        Instant confirmationDate = submissionDate.minus(48, ChronoUnit.HOURS);
+
+        when(clock.instant())
+                .thenReturn(submissionDate)
+                .thenReturn(confirmationDate);
+        order.submit();
+
+        assertDoesNotThrow(() -> order.confirm());
+        assertEquals(Order.State.CONFIRMED, order.getOrderState());
+    }
+
+    @Test
     void hoursElapsedEqualToValidPeriodHours_shouldChangeOrderStateToConfirmed() {
         Instant submissionDate = Instant.now();
         Instant confirmationDate = submissionDate.plus(24, ChronoUnit.HOURS);
