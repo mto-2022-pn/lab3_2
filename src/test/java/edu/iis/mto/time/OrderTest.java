@@ -2,6 +2,7 @@ package edu.iis.mto.time;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,11 +18,17 @@ class OrderTest {
     @Mock
     Clock clock;
     Order order;
+    Instant submissionDate;
 
     @BeforeEach
     void setUp() throws Exception {
-        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+        lenient().when(clock.getZone()).thenReturn(ZoneId.systemDefault());
         order = new Order(clock);
+    }
+
+    @Test
+    void confirmingOrderWithoutSubmission_shouldThrowOrderStateException() {
+        assertThrows(OrderStateException.class, () -> order.confirm());
     }
 
     @Test
