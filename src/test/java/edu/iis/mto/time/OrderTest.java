@@ -1,7 +1,7 @@
 package edu.iis.mto.time;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 
 @ExtendWith(MockitoExtension.class)
 class OrderTest {
@@ -26,7 +25,20 @@ class OrderTest {
     }
 
     @Test
-    void hoursElapsedGreaterThanValidPeriodHours_shouldThrowOrderExpiredException() {
+    void hoursElapsedEqualToValidPeriodHours_shouldChangeOrderStateToConfirmed() {
+        Instant submissionDate = Instant.now();
+        Instant confirmationDate = submissionDate.plus(24, ChronoUnit.HOURS);
+
+        when(clock.instant())
+                .thenReturn(submissionDate)
+                .thenReturn(confirmationDate);
+        order.submit();
+        
+        assertEquals(Order.State.CONFIRMED, order.getOrderState());
+    }
+
+    @Test
+    void hoursElapsedGreaterThanValidPeriodHours_shouldChangeOrderStateToCancelledAndThrowOrderExpiredException() {
         Instant submissionDate = Instant.now();
         Instant confirmationDate = submissionDate.plus(25, ChronoUnit.HOURS);
 
@@ -34,6 +46,8 @@ class OrderTest {
                 .thenReturn(submissionDate)
                 .thenReturn(confirmationDate);
         order.submit();
+
         assertThrows(OrderExpiredException.class, () -> order.confirm());
+        assertEquals(Order.State.CANCELLED, order.getOrderState());
     }
 }
