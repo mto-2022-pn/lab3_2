@@ -27,7 +27,6 @@ public class Order {
 
         items.add(item);
         orderState = State.CREATED;
-
     }
 
     public void submit() {
@@ -35,13 +34,12 @@ public class Order {
 
         orderState = State.SUBMITTED;
         subbmitionDate = clock.now();
-
     }
 
     public void confirm() {
         requireState(State.SUBMITTED);
         long hoursElapsedAfterSubmittion = subbmitionDate.until(clock.now(), ChronoUnit.HOURS);
-        if (hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS) {
+        if (hoursElapsedAfterSubmittion >= VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
             throw new OrderExpiredException();
         }
@@ -68,7 +66,6 @@ public class Order {
                                       + allowedStates
                                       + " to perform required  operation, but is in "
                                       + orderState);
-
     }
 
     public enum State {
