@@ -40,4 +40,9 @@ class OrderTest {
         clock.setTime(LocalDateTime.now().plusHours(VALID_PERIOD_HOURS + 1));
         assertThrows(OrderExpiredException.class, () -> order.confirm());
     }
+
+    @Test
+    void orderIncorrectStatus() {
+        assertThrows(OrderStateException.class, () -> order.confirm());
+    }
 }
