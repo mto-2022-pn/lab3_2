@@ -11,9 +11,15 @@ public class Order {
     private State orderState;
     private List<OrderItem> items = new ArrayList<>();
     private LocalDateTime subbmitionDate;
+    private Clock clock = new Clock();
 
     public Order() {
         orderState = State.CREATED;
+    }
+
+    public Order(Clock clock) {
+        this();
+        this.clock = clock;
     }
 
     public void addItem(OrderItem item) {
@@ -21,21 +27,19 @@ public class Order {
 
         items.add(item);
         orderState = State.CREATED;
-
     }
 
     public void submit() {
         requireState(State.CREATED);
 
         orderState = State.SUBMITTED;
-        subbmitionDate = LocalDateTime.now();
-
+        subbmitionDate = clock.now();
     }
 
     public void confirm() {
         requireState(State.SUBMITTED);
-        long hoursElapsedAfterSubmittion = subbmitionDate.until(LocalDateTime.now(), ChronoUnit.HOURS);
-        if (hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS) {
+        long hoursElapsedAfterSubmittion = subbmitionDate.until(clock.now(), ChronoUnit.HOURS);
+        if (hoursElapsedAfterSubmittion >= VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
             throw new OrderExpiredException();
         }
@@ -62,7 +66,6 @@ public class Order {
                                       + allowedStates
                                       + " to perform required  operation, but is in "
                                       + orderState);
-
     }
 
     public enum State {
