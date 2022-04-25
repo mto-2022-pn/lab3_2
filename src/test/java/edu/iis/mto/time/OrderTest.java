@@ -9,11 +9,20 @@ import org.junit.jupiter.api.Test;
 class OrderTest {
 
     @BeforeEach
-    void setUp() throws Exception {}
+    void setUp(){}
 
     @Test
-    void test() {
-        fail("Not yet implemented");
+    void testOrderConfirmAfterExpireDateShouldThrowOrderExpiredException() {
+        Order order = new Order();
+        order.submit();
+        assertThrows(OrderExpiredException.class, order::confirm);
     }
 
+    @Test
+    void testOrderConfirmBeforeExpireDateConfirm() {
+        Order order = new Order();
+        order.submit();
+        assertDoesNotThrow(order::confirm);
+        assertEquals(Order.State.CONFIRMED, order.getOrderState());
+    }
 }
