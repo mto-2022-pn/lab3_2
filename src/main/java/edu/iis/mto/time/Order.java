@@ -3,17 +3,28 @@ package edu.iis.mto.time;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Order {
 
     private static final long VALID_PERIOD_HOURS = 24;
     private State orderState;
-    private List<OrderItem> items = new ArrayList<>();
+    private final List<OrderItem> items = new ArrayList<>();
     private LocalDateTime subbmitionDate;
+    private CurrentTimeGetter currentTimeGetter = new DefaultCurrentTimeGetter();
 
     public Order() {
         orderState = State.CREATED;
+    }
+
+    public Order(CurrentTimeGetter timeGetter) {
+        orderState = State.CREATED;
+        this.currentTimeGetter = timeGetter;
+    }
+
+    public static long getValidPeriodHours() {
+        return VALID_PERIOD_HOURS;
     }
 
     public void addItem(OrderItem item) {
@@ -28,13 +39,13 @@ public class Order {
         requireState(State.CREATED);
 
         orderState = State.SUBMITTED;
-        subbmitionDate = LocalDateTime.now();
+        subbmitionDate = currentTimeGetter.now();
 
     }
 
     public void confirm() {
         requireState(State.SUBMITTED);
-        long hoursElapsedAfterSubmittion = subbmitionDate.until(LocalDateTime.now(), ChronoUnit.HOURS);
+        long hoursElapsedAfterSubmittion = subbmitionDate.until(currentTimeGetter.now(), ChronoUnit.HOURS);
         if (hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
             throw new OrderExpiredException();
@@ -59,9 +70,9 @@ public class Order {
         }
 
         throw new OrderStateException("order should be in state "
-                                      + allowedStates
-                                      + " to perform required  operation, but is in "
-                                      + orderState);
+                + Arrays.toString(allowedStates)
+                + " to perform required  operation, but is in "
+                + orderState);
 
     }
 
