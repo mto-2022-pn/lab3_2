@@ -12,11 +12,10 @@ public class Order {
     private State orderState;
     private List<OrderItem> items = new ArrayList<>();
     private LocalDateTime subbmitionDate;
-    private final edu.iis.mto.time.Clock clock;
+    private edu.iis.mto.time.Clock clock = new DefaultClock();
 
     public Order() {
         orderState = State.CREATED;
-        clock = new FakeClock();
     }
     public Order(edu.iis.mto.time.Clock clock) {
         orderState = State.CREATED;
