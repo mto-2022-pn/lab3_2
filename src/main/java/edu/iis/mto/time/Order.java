@@ -1,5 +1,6 @@
 package edu.iis.mto.time;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -11,9 +12,14 @@ public class Order {
     private State orderState;
     private List<OrderItem> items = new ArrayList<>();
     private LocalDateTime subbmitionDate;
+    private edu.iis.mto.time.Clock clock = new DefaultClock();
 
     public Order() {
         orderState = State.CREATED;
+    }
+    public Order(edu.iis.mto.time.Clock clock) {
+        orderState = State.CREATED;
+        this.clock = clock;
     }
 
     public void addItem(OrderItem item) {
@@ -28,13 +34,13 @@ public class Order {
         requireState(State.CREATED);
 
         orderState = State.SUBMITTED;
-        subbmitionDate = LocalDateTime.now();
+        subbmitionDate = clock.getTime();
 
     }
 
     public void confirm() {
         requireState(State.SUBMITTED);
-        long hoursElapsedAfterSubmittion = subbmitionDate.until(LocalDateTime.now(), ChronoUnit.HOURS);
+        long hoursElapsedAfterSubmittion = subbmitionDate.until(clock.getTime(), ChronoUnit.HOURS);
         if (hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS) {
             orderState = State.CANCELLED;
             throw new OrderExpiredException();
