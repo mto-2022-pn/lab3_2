@@ -1,6 +1,7 @@
 package edu.iis.mto.time;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,7 @@ class OrderTest {
 
     @BeforeEach
     void setUp() {
-        when(clock.getZone())
+        lenient().when(clock.getZone())
                 .thenReturn(ZoneId.systemDefault());
 
         order = new Order(clock);
@@ -57,5 +58,36 @@ class OrderTest {
         order.submit();
         assertDoesNotThrow(order::confirm);
         assertEquals(Order.State.CONFIRMED, order.getOrderState());
+    }
+
+    @Test
+    void testOrderRealizeAfterCorrectConfirm() {
+        orderSubmitTime = Instant.now();
+        orderConfirmTime = orderSubmitTime.plus(1, ChronoUnit.HOURS);
+
+        when(clock.instant())
+                .thenReturn(orderSubmitTime)
+                .thenReturn(orderConfirmTime);
+
+        order.submit();
+        assertEquals(Order.State.SUBMITTED, order.getOrderState());
+        order.confirm();
+        assertEquals(Order.State.CONFIRMED, order.getOrderState());
+        order.realize();
+        assertEquals(Order.State.REALIZED, order.getOrderState());
+    }
+
+    @Test
+    void testOrderConfirmWithoutSubmit() {
+        assertThrows(OrderStateException.class, order::confirm);
+    }
+
+    @Test
+    void testOrderRealizeWithoutConfirm() {
+        orderSubmitTime = Instant.now();
+        when(clock.instant())
+                .thenReturn(orderSubmitTime);
+        order.submit();
+        assertThrows(OrderStateException.class, order::realize);
     }
 }
