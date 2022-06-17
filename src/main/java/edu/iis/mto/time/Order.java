@@ -58,9 +58,6 @@ public class Order {
         return orderState;
     }
 
-    public long getValidPeriodHours(){
-        return VALID_PERIOD_HOURS;
-    }
     private void requireState(State... allowedStates) {
         for (State allowedState : allowedStates) {
             if (orderState == allowedState) {
