@@ -13,4 +13,8 @@ public class FakeSystemClock {
 	public void setTime(LocalDateTime time) {
 		this.time = time;
 	}
+
+	public void changeHours(LocalDateTime time, long hours) {
+		this.time = time.plusHours(hours);
+	}
 }
